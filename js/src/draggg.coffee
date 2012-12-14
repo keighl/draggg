@@ -35,6 +35,9 @@ methods =
         translate_x_curr: 0
         x_threshold: 100
         animate_x: 0
+        before: ->
+        after: ->
+        new_idx: (idx) ->
 
       $.extend(settings, options) if options
 
@@ -173,6 +176,7 @@ methods =
     $self = $(@)
     data  = $self.data 'draggg'
     return false unless data
+    data.before.call $self
     data.dragging  = true
     data.animating = false
     return
@@ -187,6 +191,8 @@ methods =
     $self.unbind "mouseout.draggg"
     $self.unbind "mouseup.draggg"
     data.dragging = false
+
+    data.after.call $self
 
     last_slide_idx = data.slides.length-1
     if data.translate_x_curr < (data.translate_x_origin - data.x_threshold)
@@ -236,13 +242,14 @@ methods =
     return
 
   step_x_to: (idx) ->
-    console.log idx
     $self = $(@)
     data  = $self.data 'draggg'
     return false unless data
-    data.animate_x = -idx*data.width
-    data.animating = yes
-    data.idx = idx
+    unless data.animating
+      data.animate_x = -idx*data.width
+      data.animating = true
+      data.idx = idx
+      data.new_idx.call $self, data.idx
 
   animate_x: ->
     $self = $(@)

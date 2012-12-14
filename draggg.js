@@ -38,7 +38,10 @@
           translate_x_origin: 0,
           translate_x_curr: 0,
           x_threshold: 100,
-          animate_x: 0
+          animate_x: 0,
+          before: function() {},
+          after: function() {},
+          new_idx: function(idx) {}
         };
         if (options) {
           $.extend(settings, options);
@@ -206,6 +209,7 @@
       if (!data) {
         return false;
       }
+      data.before.call($self);
       data.dragging = true;
       data.animating = false;
     },
@@ -222,6 +226,7 @@
       $self.unbind("mouseout.draggg");
       $self.unbind("mouseup.draggg");
       data.dragging = false;
+      data.after.call($self);
       last_slide_idx = data.slides.length - 1;
       if (data.translate_x_curr < (data.translate_x_origin - data.x_threshold)) {
         if (data.idx !== last_slide_idx) {
@@ -282,15 +287,17 @@
     },
     step_x_to: function(idx) {
       var $self, data;
-      console.log(idx);
       $self = $(this);
       data = $self.data('draggg');
       if (!data) {
         return false;
       }
-      data.animate_x = -idx * data.width;
-      data.animating = true;
-      return data.idx = idx;
+      if (!data.animating) {
+        data.animate_x = -idx * data.width;
+        data.animating = true;
+        data.idx = idx;
+        return data.new_idx.call($self, data.idx);
+      }
     },
     animate_x: function() {
       var $self, data, f, k, x;
