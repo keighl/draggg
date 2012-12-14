@@ -35,6 +35,7 @@ methods =
         translate_x_curr: 0
         x_threshold: 100
         animate_x: 0
+        animate_interpolation: 0.5
         before: ->
         after: ->
         new_idx: (idx) ->
@@ -257,7 +258,7 @@ methods =
     return false unless data
 
     if data.animating
-      k = 0.26
+      k = data.animate_interpolation
       x = data.animate_x - data.translate_x_curr;
       f = k * x;
 
